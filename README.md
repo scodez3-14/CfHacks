@@ -1,42 +1,51 @@
+# CF Practice Bot
 
-# Telegram Codeforces Bot
-
-A simple Telegram bot that asks users for a problem rating and number of questions,
-then sends random Codeforces problems matching that rating.
+A Telegram bot for practicing Codeforces problems interactively via chat. This bot lets users request problems by rating, tag, or randomly, and tracks their history using SQLite.
 
 ## Features
-- Ask user for a Codeforces problem rating (e.g., 800, 1200)
-- Ask user for number of questions to receive
-- Fetch random problems from Codeforces API
-- Send problem name and link directly to the user
-- Simple conversation flow with state tracking
+- Get Codeforces problems by rating or tag
+- Request random problems
+- View history of received problems
+- Inline keyboard for easy selection
+- Stores user state and history in SQLite
 
-## Tech Stack
-- Python 3
-- Flask (web framework)
-- Requests (HTTP requests)
-- Render (for web deployment)
-
-## Installation
-1. Clone the repository
-2. Create virtual environment (optional)
-3. Install dependencies:
-    pip install flask requests
-4. Set your Telegram bot token as environment variable:
-    export BOT_TOKEN="your_telegram_bot_token"  # Linux/macOS
-    set BOT_TOKEN="your_telegram_bot_token"     # Windows
+## Setup
+1. **Clone the repo**
+2. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Set environment variable**:
+   - `BOT_TOKEN`: Your Telegram bot token
+   - Optionally, set `PORT` (default: 10000)
+4. **Run the bot**:
+   ```bash
+   python main.py
+   ```
 
 ## Usage
-1. Run locally:
-    python app.py
-2. Set webhook:
-    https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook?url=<YOUR_URL>
-3. Chat with bot in Telegram:
-    - Enter rating (e.g., 1200)
-    - Enter number of questions (e.g., 3)
-    - Receive random CF problems
+- Add your bot to Telegram and set the webhook to your server URL
+- Supported commands:
+  - `/start` or `/help`: Show menu
+  - `/rating`: Choose rating and number of problems
+  - `/tags`: Choose by tag
+  - `/random`: Get a random problem
+  - `/history`: Show last received problems
+
+## File Overview
+- `main.py`: Main bot logic, webhook handler, database, and Codeforces API integration
+- `requirements.txt`: Python dependencies
+
+## Database
+- SQLite file: `botdata.db`
+- Tables: `users` (user state), `history` (problem history)
+
+## API
+- Uses Telegram Bot API and Codeforces API
 
 ## Deployment
-- Deploy as Web Service on Render
-- Start command: python app.py
-- Add BOT_TOKEN as environment variable
+- Can be run locally or deployed to any server supporting Python and Flask
+- Set up HTTPS and Telegram webhook for production use
+
+## License
+MIT
