@@ -29,7 +29,7 @@ def init_db():
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     chat_id INTEGER,
                     contestId INTEGER,
-                    index TEXT,
+                    problem_index TEXT,
                     name TEXT,
                     rating INTEGER,
                     ts DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -70,7 +70,7 @@ def db_upsert_user(chat_id, **kwargs):
 def db_add_history(chat_id, p):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("INSERT INTO history (chat_id, contestId, index, name, rating) VALUES (?, ?, ?, ?, ?)",
+    c.execute("INSERT INTO history (chat_id, contestId, problem_index, name, rating) VALUES (?, ?, ?, ?, ?)",
               (chat_id, p["contestId"], p["index"], p["name"], p.get("rating")))
     conn.commit()
     conn.close()
@@ -78,7 +78,7 @@ def db_add_history(chat_id, p):
 def db_get_history(chat_id, limit=10):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("SELECT contestId, index, name, rating, ts FROM history WHERE chat_id=? ORDER BY ts DESC LIMIT ?", (chat_id, limit))
+    c.execute("SELECT contestId, problem_index, name, rating, ts FROM history WHERE chat_id=? ORDER BY ts DESC LIMIT ?", (chat_id, limit))
     rows = c.fetchall()
     conn.close()
     return rows
@@ -209,7 +209,6 @@ def index():
         return "Bot is alive"
     data = request.get_json()
 
-    # Handle callback_query (inline keyboard presses)
     if "callback_query" in data:
         cb = data["callback_query"]
         chat_id = cb["message"]["chat"]["id"]
@@ -230,7 +229,6 @@ def index():
             answer_callback(callback_id, "Unknown action.")
         return jsonify(ok=True)
 
-    # Handle normal messages
     if "message" in data:
         msg = data["message"]
         text = msg.get("text","").strip()
@@ -238,6 +236,9 @@ def index():
 
         if db_get_user(chat_id) is None:
             db_upsert_user(chat_id, step=None)
+
+        u = db_get_user(chat_id)
+        step = u.get("step")
 
         # Commands
         if text == "/start":
@@ -258,10 +259,7 @@ def index():
         if text == "/history":
             send_history(chat_id); return jsonify(ok=True)
 
-        # Handle conversation states
-        u = db_get_user(chat_id)
-        step = u.get("step")
-
+        # Conversation states
         if step == "awaiting_rating":
             if text.isdigit():
                 rating = int(text)
@@ -299,7 +297,6 @@ def index():
                 send_message(chat_id, "Please enter a number of problems (max 10).")
             return jsonify(ok=True)
 
-        # Fallback
         send_message(chat_id, "I didn't understand that. Use /help to see commands.")
         return jsonify(ok=True)
 
