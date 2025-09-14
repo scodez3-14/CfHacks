@@ -228,6 +228,7 @@ def index():
         else:
             answer_callback(callback_id, "Unknown action.")
         return jsonify(ok=True)
+    
 
     if "message" in data:
         msg = data["message"]
@@ -302,6 +303,22 @@ def index():
 
     return jsonify(ok=True)
 
+     # --- Self-ping Keep Alive ---
+def keep_alive():
+    url = os.getenv("SELF_URL")  # set SELF_URL in Render dashboard to your app URL
+    if not url:
+        print("⚠️ SELF_URL not set, skipping keep-alive pings")
+        return
+    while True:
+        try:
+            requests.get(url, timeout=10)
+            print(f"🔄 Pinged {url} to keep alive")
+        except Exception as e:
+            print("Ping failed:", e)
+        time.sleep(600)  # every 10 minutes
+        
+
 if __name__ == "__main__":
     init_db()
+    threading.Thread(target=keep_alive, daemon=True).start()
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
