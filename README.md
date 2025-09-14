@@ -48,4 +48,4 @@ A Telegram bot for practicing Codeforces problems interactively via chat. This b
 - Set up HTTPS and Telegram webhook for production use
 
 ## License
-MIT
+XD :(
