@@ -1,4 +1,4 @@
-"""
+
 # Telegram Codeforces Bot
 
 A simple Telegram bot that asks users for a problem rating and number of questions,
@@ -40,4 +40,3 @@ then sends random Codeforces problems matching that rating.
 - Deploy as Web Service on Render
 - Start command: python app.py
 - Add BOT_TOKEN as environment variable
-"""
